@@ -4,7 +4,7 @@ import {
   calculateExpression
 } from "./logic/calculator";
 
-
+import { downloadJson } from "./utils/downloadJson";
 import {
   isValidNumber,
   isValidOperator
@@ -85,24 +85,7 @@ function handleParenthesis(parenthesis) {
   setExpression(expression + parenthesis);
 }
 
-  function handleDownloadJson() {
-    const jsonData = JSON.stringify(history, null, 2);
 
-    const blob = new Blob([jsonData], {
-      type: "application/json"
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "history.json";
-
-    link.click();
-
-    URL.revokeObjectURL(url);
-  }
 
   function handleDecimal() {
     const currentNumber = display;
@@ -320,9 +303,9 @@ function handleParenthesis(parenthesis) {
           Clear History
         </button>
 
-        <button onClick={handleDownloadJson}>
-          Download JSON
-        </button>
+<button onClick={() => downloadJson(history)}>
+  Download JSON
+</button>
 
       </div>
 
