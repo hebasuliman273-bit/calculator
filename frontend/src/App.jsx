@@ -117,38 +117,55 @@ function App() {
   }
 
   function parseExpression(expression) {
-    const parts = [];
-    let currentNumber = "";
+  const parts = [];
+  let currentNumber = "";
 
-    for (let i = 0; i < expression.length; i++) {
-      const character = expression[i];
+  for (let i = 0; i < expression.length; i++) {
+    const character = expression[i];
 
-      if (
-        character === "+" ||
-        character === "-" ||
-        character === "*" ||
-        character === "/" ||
-        character === "%" ||
-        character === "(" ||
-        character === ")"
-      ) {
-        if (currentNumber !== "") {
-          parts.push(Number(currentNumber));
-          currentNumber = "";
-        }
+    // السالب إذا كان علامة لرقم سالب
+    if (
+      character === "-" &&
+      (
+        i === 0 ||
+        expression[i - 1] === "(" ||
+        expression[i - 1] === "+" ||
+        expression[i - 1] === "-" ||
+        expression[i - 1] === "*" ||
+        expression[i - 1] === "/" ||
+        expression[i - 1] === "%"
+      )
+    ) {
+      currentNumber = currentNumber + character;
+      continue;
+    }
 
-        parts.push(character);
-      } else {
-        currentNumber = currentNumber + character;
+    if (
+      character === "+" ||
+      character === "-" ||
+      character === "*" ||
+      character === "/" ||
+      character === "%" ||
+      character === "(" ||
+      character === ")"
+    ) {
+      if (currentNumber !== "") {
+        parts.push(Number(currentNumber));
+        currentNumber = "";
       }
-    }
 
-    if (currentNumber !== "") {
-      parts.push(Number(currentNumber));
+      parts.push(character);
+    } else {
+      currentNumber = currentNumber + character;
     }
-
-    return parts;
   }
+
+  if (currentNumber !== "") {
+    parts.push(Number(currentNumber));
+  }
+
+  return parts;
+}
 
   function handleCalculate() {
     // إذا كانت العملية محسوبة مسبقًا، لا نحسب مرة ثانية
