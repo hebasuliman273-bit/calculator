@@ -82,9 +82,19 @@ function App() {
     setExpression("");
   }
 
-  function handleParenthesis(parenthesis) {
-    setExpression(expression + parenthesis);
+function handleParenthesis(parenthesis) {
+  const openParentheses =
+    (expression.match(/\(/g) || []).length;
+
+  const closeParentheses =
+    (expression.match(/\)/g) || []).length;
+
+  if (parenthesis === ")" && openParentheses <= closeParentheses) {
+    return;
   }
+
+  setExpression(expression + parenthesis);
+}
 
   function handleDownloadJson() {
     const jsonData = JSON.stringify(history, null, 2);
