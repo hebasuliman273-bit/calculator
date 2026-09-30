@@ -72,7 +72,24 @@ function handleClear() {
   setWaitingForNumber(false);
   setExpression("");
 }
+ function handleDownloadJson() {
+  const jsonData = JSON.stringify(history, null, 2);
 
+  const blob = new Blob([jsonData], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "history.json";
+
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
 function handleDecimal() {
   const currentNumber = display;
 
@@ -119,6 +136,16 @@ const [history, setHistory] = useState([]);
   const [expression, setExpression] = useState("");
 
 function handleCalculate() {
+  if (
+    expression.endsWith("+") ||
+    expression.endsWith("-") ||
+    expression.endsWith("*") ||
+    expression.endsWith("/") ||
+    expression.endsWith("%")
+  ) {
+    return;
+  }
+
   const parts = parseExpression(expression);
 
   const result = calculateExpression(parts);
@@ -135,7 +162,6 @@ function handleCalculate() {
 
   setExpression(expression + "=" + result);
 }
-
   function handleNumber(number) {
     if (waitingForNumber) {
       setDisplay(number);
@@ -169,7 +195,9 @@ function handleOperator(newOperator) {
   setOperator(newOperator);
   setWaitingForNumber(true);
 }
-
+function handleClearHistory() {
+  setHistory([]);
+}
 
 function calculateExpression(parts) {
   // أولًا نحسب *, /, %
@@ -307,7 +335,12 @@ function calculateExpression(parts) {
 <button onClick={handleDelete}>
   ⌫
 </button>
-
+<button onClick={handleClearHistory}>
+  Clear History
+</button>
+<button onClick={handleDownloadJson}>
+  Download JSON
+</button>
 <h2>History</h2>
 
 <div>
