@@ -1,38 +1,326 @@
 import { useState } from "react";
 
-
-function NumberButton(props){
-  return <button> props.number </button>
+function NumberButton(props) {
+  return (
+    <button onClick={() => props.onNumberClick(props.number)}>
+      {props.number}
+    </button>
+  );
 }
 
-
+function OperatorButton(props) {
+  return (
+    <button onClick={() => props.onOperatorClick(props.operator)}>
+      {props.operator}
+    </button>
+  );
+}
 
 function App() {
 
+  function handleDelete() {
+  if (expression.length === 0) {
+    return;
+  }
 
-function handleNumber(number){
-  if (display === "0"){
-    setDisplay(number)
+  const newExpression = expression.slice(0, -1);
+
+  setExpression(newExpression);
+
+  if (
+    newExpression.endsWith("+") ||
+    newExpression.endsWith("-") ||
+    newExpression.endsWith("*") ||
+    newExpression.endsWith("/") ||
+    newExpression.endsWith("%")
+  ) {
+    setDisplay("0");
+    setWaitingForNumber(true);
   } else {
-    setDisplay( display + number )
+    const parts = parseExpression(newExpression);
+    const lastPart = parts[parts.length - 1];
+
+    setDisplay(String(lastPart));
+    setWaitingForNumber(false);
   }
 }
+  function calculate(number1, number2, operator) {
+    if (operator === "+") {
+      return number1 + number2;
+    }
 
-  const [display , setDisplay]= useState("0")
+    if (operator === "-") {
+      return number1 - number2;
+    }
+
+    if (operator === "*") {
+      return number1 * number2;
+    }
+
+    if (operator === "/") {
+      return number1 / number2;
+    }
+
+    if (operator === "%") {
+      return number1 % number2;
+    }
+  }
+function handleClear() {
+  setDisplay("0");
+  setOperator(null);
+  setFirstNumber(null);
+  setWaitingForNumber(false);
+  setExpression("");
+}
+
+function handleDecimal() {
+  const currentNumber = display;
+
+  if (currentNumber.includes(".")) {
+    return;
+  }
+
+  setDisplay(currentNumber + ".");
+  setExpression(expression + ".");
+}
+
+  function parseExpression(expression) {
+    const parts = [];
+    let currentNumber = "";
+
+    for (let i = 0; i < expression.length; i++) {
+      const character = expression[i];
+
+      if (
+        character === "+" ||
+        character === "-" ||
+        character === "*" ||
+        character === "/" ||
+        character === "%"
+      ) {
+        parts.push(Number(currentNumber));
+        parts.push(character);
+        currentNumber = "";
+      } else {
+        currentNumber = currentNumber + character;
+      }
+    }
+
+    parts.push(Number(currentNumber));
+
+    return parts;
+  }
+
+  const [display, setDisplay] = useState("0");
+  const [operator, setOperator] = useState(null);
+  const [firstNumber, setFirstNumber] = useState(null);
+  const [waitingForNumber, setWaitingForNumber] = useState(false);
+const [history, setHistory] = useState([]);
+  const [expression, setExpression] = useState("");
+
+function handleCalculate() {
+  const parts = parseExpression(expression);
+
+  const result = calculateExpression(parts);
+
+  setDisplay(String(result));
+
+  setHistory([
+    ...history,
+    {
+      expression: expression,
+      result: result
+    }
+  ]);
+
+  setExpression(expression + "=" + result);
+}
+
+  function handleNumber(number) {
+    if (waitingForNumber) {
+      setDisplay(number);
+      setExpression(expression + number);
+      setWaitingForNumber(false);
+    } else if (display === "0") {
+      setDisplay(number);
+      setExpression(number);
+    } else {
+      setDisplay(display + number);
+      setExpression(expression + number);
+    }
+  }
+
+function handleOperator(newOperator) {
+  if (
+    expression.endsWith("+") ||
+    expression.endsWith("-") ||
+    expression.endsWith("*") ||
+    expression.endsWith("/") ||
+    expression.endsWith("%")
+  ) {
+    const newExpression = expression.slice(0, -1) + newOperator;
+
+    setExpression(newExpression);
+  } else {
+    setExpression(expression + newOperator);
+  }
+
+  setFirstNumber(display);
+  setOperator(newOperator);
+  setWaitingForNumber(true);
+}
+
+
+function calculateExpression(parts) {
+  // أولًا نحسب *, /, %
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const operator = parts[i];
+
+    if (
+      operator === "*" ||
+      operator === "/" ||
+      operator === "%"
+    ) {
+      const number1 = parts[i - 1];
+      const number2 = parts[i + 1];
+
+      const result = calculate(number1, number2, operator);
+
+      parts.splice(i - 1, 3, result);
+
+      i -= 2;
+    }
+  }
+
+  // ثانيًا نحسب +, -
+
+  let result = parts[0];
+
+  for (let i = 1; i < parts.length; i += 2) {
+    const operator = parts[i];
+    const number = parts[i + 1];
+
+    result = calculate(result, number, operator);
+  }
+
+  return result;
+}
+
   return (
     <div>
       <h1>Calculator</h1>
-      <h2> {display } </h2>
-      <button onClick={() => handleNumber("7")}>7</button>
-      <button onClick={() => handleNumber("8")}>8</button>
-      <button onClick={() => handleNumber("9")}>9</button>
-<button
-  onClick={() => handleNumber("0")}>
-  0
+
+      {/* Calculator Display */}
+      <h2>{expression || "0"}</h2>
+
+      {/* Numbers */}
+
+      <NumberButton
+        number="0"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="1"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="2"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="3"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="4"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="5"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="6"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="7"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="8"
+        onNumberClick={handleNumber}
+      />
+
+      <NumberButton
+        number="9"
+        onNumberClick={handleNumber}
+      />
+
+      {/* Operators */}
+
+      <OperatorButton
+        operator="+"
+        onOperatorClick={handleOperator}
+      />
+
+      <OperatorButton
+        operator="-"
+        onOperatorClick={handleOperator}
+      />
+
+      <OperatorButton
+        operator="*"
+        onOperatorClick={handleOperator}
+      />
+
+      <OperatorButton
+        operator="/"
+        onOperatorClick={handleOperator}
+      />
+
+      <OperatorButton
+        operator="%"
+        onOperatorClick={handleOperator}
+      />
+
+      {/* Equals */}
+
+      <button onClick={handleCalculate}>
+        =
+      </button>
+      <button onClick={handleClear}>
+  C
+</button>
+<button onClick={handleDecimal}>
+  .
+</button>
+<button onClick={handleDelete}>
+  ⌫
 </button>
 
+<h2>History</h2>
+
+<div>
+  {history.map((item, index) => (
+    <p key={index}>
+      {item.expression} = {item.result}
+    </p>
+  ))}
+</div>
     </div>
-  )
+
+    
+  );
 }
 
-export default App
+export default App;
