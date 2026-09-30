@@ -235,14 +235,16 @@ function calculateExpression(parts) {
   return result;
 }
 
-  return (
-    <div>
-      <h1>Calculator</h1>
+return (
+  <div className="calculator-container">
 
-      {/* Calculator Display */}
-      <h2>{expression || "0"}</h2>
+    <h1>Calculator</h1>
 
-      {/* Numbers */}
+    <h2 className="display">
+      {expression || "0"}
+    </h2>
+
+    <div className="buttons">
 
       <NumberButton
         number="0"
@@ -294,8 +296,6 @@ function calculateExpression(parts) {
         onNumberClick={handleNumber}
       />
 
-      {/* Operators */}
-
       <OperatorButton
         operator="+"
         onOperatorClick={handleOperator}
@@ -321,39 +321,52 @@ function calculateExpression(parts) {
         onOperatorClick={handleOperator}
       />
 
-      {/* Equals */}
-
       <button onClick={handleCalculate}>
         =
       </button>
-      <button onClick={handleClear}>
-  C
-</button>
-<button onClick={handleDecimal}>
-  .
-</button>
-<button onClick={handleDelete}>
-  ⌫
-</button>
-<button onClick={handleClearHistory}>
-  Clear History
-</button>
-<button onClick={handleDownloadJson}>
-  Download JSON
-</button>
-<h2>History</h2>
 
-<div>
-  {history.map((item, index) => (
-    <p key={index}>
-      {item.expression} = {item.result}
-    </p>
-  ))}
-</div>
+      <button onClick={handleClear}>
+        C
+      </button>
+
+      <button onClick={handleDecimal}>
+        .
+      </button>
+
+      <button onClick={handleDelete}>
+        ⌫
+      </button>
+
     </div>
 
-    
-  );
+
+    <div className="history-buttons">
+
+      <button onClick={handleClearHistory}>
+        Clear History
+      </button>
+
+      <button onClick={handleDownloadJson}>
+        Download JSON
+      </button>
+
+    </div>
+
+
+    <div className="history">
+
+      <h2>History</h2>
+
+      {history.map((item, index) => (
+        <p className="history-item" key={index}>
+          {item.expression} = {item.result}
+        </p>
+      ))}
+
+    </div>
+
+  </div>
+);
 }
 
 export default App;
